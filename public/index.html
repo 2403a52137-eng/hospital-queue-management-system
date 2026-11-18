@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeCare Hospital - Queue & Appointment Management System</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              800: '#0c4a6e',
+            },
+            emergency: {
+              light: '#fef2f2',
+              DEFAULT: '#ef4444',
+              dark: '#b91c1c'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- TOP EMERGENCY & HELPLINE TICKER -->
+  <div class="bg-slate-900 text-white px-4 py-2 text-xs md:text-sm font-medium flex flex-wrap justify-between items-center border-b border-slate-800">
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center gap-1.5 bg-red-600/90 text-white px-2.5 py-0.5 rounded-full font-bold animate-pulse text-xs tracking-wider">
+        <i class="fa-solid fa-truck-medical"></i> 24x7 EMERGENCY
+      </span>
+      <span class="text-slate-300">Direct Entry Available • No Token Wait For Critical Trauma & Emergencies</span>
+    </div>
+    <div class="flex items-center gap-4 text-slate-300 mt-1 md:mt-0">
+      <span><i class="fa-solid fa-phone text-emerald-400 mr-1"></i> ER Helpline: <strong>108 / +91 40 2233 4455</strong></span>
+      <span id="liveClock" class="font-mono bg-slate-800 px-2 py-0.5 rounded text-amber-300">--:--:--</span>
+    </div>
+  </div>
+
+  <!-- NAVIGATION BAR -->
+  <header class="bg-white shadow-sm sticky top-0 z-40 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-20">
+      
+      <!-- LOGO -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('home')">
+        <div class="w-12 h-12 bg-gradient-to-tr from-brand-600 to-teal-400 rounded-xl flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+          <i class="fa-solid fa-hospital text-2xl"></i>
+        </div>
+        <div>
+          <div class="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+            LifeCare <span class="text-brand-600 text-xs font-semibold px-2 py-0.5 rounded bg-brand-50 border border-brand-200">HOSPITAL</span>
+          </div>
+          <p class="text-xs text-slate-500 font-medium">Smart Queue & Appointment System</p>
+        </div>
+      </div>
+
+      <!-- MAIN NAVIGATION TABS -->
+      <nav class="hidden md:flex items-center gap-1 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+        <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-brand-600 transition flex items-center gap-2">
+          <i class="fa-solid fa-house"></i> Home
+        </button>
+        <button onclick="switchTab('patient')" id="nav-patient" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-brand-600 transition flex items-center gap-2">
+          <i class="fa-solid fa-user-injured"></i> Patient Portal
+        </button>
+        <button onclick="switchTab('doctor')" id="nav-doctor" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-brand-600 transition flex items-center gap-2">
+          <i class="fa-solid fa-user-doctor"></i> Doctor Chamber
+        </button>
+        <button onclick="switchTab('admin')" id="nav-admin" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-brand-600 transition flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved"></i> Admin
+        </button>
+        <button onclick="switchTab('display')" id="nav-display" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-brand-600 transition flex items-center gap-2">
+          <i class="fa-solid fa-tv"></i> Live Display
+        </button>
+      </nav>
+
+      <!-- EMERGENCY FAST-TRACK BUTTON (NO TOKEN) -->
+      <div class="flex items-center gap-3">
+        <button onclick="openEmergencyModal()" class="relative group overflow-hidden bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-red-500/30 flex items-center gap-2 text-sm transition transform hover:-translate-y-0.5">
+          <span class="absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3 bg-white rounded-full animate-ping"></span>
+          <i class="fa-solid fa-bolt-lightning text-amber-300"></i>
+          <span>EMERGENCY (NO TOKEN)</span>
+        </button>
+
+        <!-- USER SESSION BADGE -->
+        <div id="userSessionBadge" class="hidden items-center gap-2 pl-2 border-l border-slate-200">
+          <div class="text-right">
+            <div id="sessionUserName" class="text-xs font-bold text-slate-800">User</div>
+            <div id="sessionUserRole" class="text-[10px] text-slate-500 uppercase font-semibold">Role</div>
+          </div>
+          <button onclick="logoutUser()" title="Logout" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-600 flex items-center justify-center transition">
+            <i class="fa-solid fa-right-from-bracket text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MOBILE NAVIGATION BAR -->
+  <div class="md:hidden bg-white border-b border-slate-200 px-4 py-2 flex justify-around overflow-x-auto text-xs font-semibold">
+    <button onclick="switchTab('home')" class="py-1 px-2 text-slate-600">Home</button>
+    <button onclick="switchTab('patient')" class="py-1 px-2 text-slate-600">Patient</button>
+    <button onclick="switchTab('doctor')" class="py-1 px-2 text-slate-600">Doctor</button>
+    <button onclick="switchTab('admin')" class="py-1 px-2 text-slate-600">Admin</button>
+    <button onclick="switchTab('display')" class="py-1 px-2 text-slate-600">Display</button>
+  </div>
+
+  <!-- NOTIFICATION TOAST -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+    <!-- ========================================================================= -->
+    <!-- 1. HOME DASHBOARD TAB                                                      -->
+    <!-- ========================================================================= -->
+    <section id="tab-home" class="tab-content space-y-8">
+      
+      <!-- HERO BANNER -->
+      <div class="relative bg-gradient-to-r from-brand-700 via-brand-600 to-teal-600 rounded-3xl p-8 md:p-12 text-white shadow-xl overflow-hidden">
+        <div class="absolute -right-12 -bottom-12 opacity-10 text-9xl">
+          <i class="fa-solid fa-hospital"></i>
+        </div>
+        <div class="max-w-2xl relative z-10 space-y-4">
+          <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase">
+            <i class="fa-solid fa-circle-check text-emerald-300"></i> Smart OPD & Emergency Triage System
+          </div>
+          <h1 class="text-3xl md:text-5xl font-black leading-tight tracking-tight">
+            Seamless Hospital Queue & Instant Emergency Care
+          </h1>
+          <p class="text-brand-100 text-sm md:text-base leading-relaxed">
+            Book regular OPD appointments with real-time queue tracking tokens, or instantly bypass all token lines during critical medical emergencies for direct doctor access.
+          </p>
+
+          <div class="pt-4 flex flex-wrap gap-4">
+            <button onclick="switchTab('patient'); openBookModal();" class="bg-white text-brand-700 hover:bg-brand-50 font-bold px-6 py-3 rounded-xl shadow-md transition flex items-center gap-2">
+              <i class="fa-solid fa-calendar-check"></i> Book OPD Appointment
+            </button>
+            <button onclick="openEmergencyModal()" class="bg-red-600 hover:bg-red-500 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-red-900/30 transition flex items-center gap-2 animate-bounce">
+              <i class="fa-solid fa-truck-medical text-amber-300"></i> Emergency Direct Pass (No Token)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PORTAL CARDS (PATIENT, DOCTOR, ADMIN, EMERGENCY) -->
+      <div>
+        <h2 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-door-open text-brand-600"></i> Choose Portal & Services
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- PATIENT PORTAL CARD -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between group">
+            <div class="space-y-3">
+              <div class="w-12 h-12 bg-sky-100 text-sky-600 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition">
+                <i class="fa-solid fa-hospital-user"></i>
+              </div>
+              <h3 class="text-lg font-bold text-slate-900">Patient Portal</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Book routine doctor appointments, generate OPD tokens, track live queue wait times from home, and view your consultation history.
+              </p>
+            </div>
+            <div class="pt-6">
+              <button onclick="switchTab('patient')" class="w-full bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                <span>Enter Patient Portal</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- DOCTOR PORTAL CARD -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between group">
+            <div class="space-y-3">
+              <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition">
+                <i class="fa-solid fa-stethoscope"></i>
+              </div>
+              <h3 class="text-lg font-bold text-slate-900">Doctor Chamber</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Dedicated OPD chamber view for doctors. Call next patient with intelligent priority queue (emergency patients first, followed by sequential tokens).
+              </p>
+            </div>
+            <div class="pt-6">
+              <button onclick="switchTab('doctor')" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                <span>Doctor Login & Chamber</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- ADMIN PORTAL CARD -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between group">
+            <div class="space-y-3">
+              <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition">
+                <i class="fa-solid fa-chart-pie"></i>
+              </div>
+              <h3 class="text-lg font-bold text-slate-900">Admin Control Center</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Hospital administration dashboard to manage doctor schedules, monitor emergency alerts, review wait times, and control the entire queue system.
+              </p>
+            </div>
+            <div class="pt-6">
+              <button onclick="switchTab('admin')" class="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                <span>Admin Login & Stats</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- LIVE HOSPITAL OPD STATUS BOARD -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-6 bg-slate-50 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-tv text-brand-600"></i>
+              Hospital Live Queue & Chamber Status
+            </h2>
+            <p class="text-xs text-slate-500">Auto-refreshing live OPD chambers and emergency alerts</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Sync Active
+            </span>
+            <button onclick="loadAllData()" class="p-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 text-xs font-medium transition" title="Refresh Now">
+              <i class="fa-solid fa-rotate"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-100 text-slate-700 text-xs uppercase font-bold tracking-wider">
+              <tr>
+                <th class="px-6 py-4">Chamber / Room</th>
+                <th class="px-6 py-4">Doctor & Specialty</th>
+                <th class="px-6 py-4">Currently Serving</th>
+                <th class="px-6 py-4">Emergency Cases</th>
+                <th class="px-6 py-4">Regular Tokens Waiting</th>
+                <th class="px-6 py-4 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="homeDoctorTable" class="divide-y divide-slate-200">
+              <!-- Dynamically populated -->
+              <tr>
+                <td colspan="6" class="text-center py-8 text-slate-400">Loading live doctor chambers...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 2. PATIENT PORTAL TAB                                                      -->
+    <!-- ========================================================================= -->
+    <section id="tab-patient" class="tab-content hidden space-y-8">
+      
+      <!-- PATIENT HEADER -->
+      <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div>
+          <h2 class="text-2xl font-black text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-user-injured text-sky-600"></i> Patient Care Portal
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">Book routine consultations, track your token, or request direct emergency fast-track admission</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <button onclick="openBookModal()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold px-4 py-2.5 rounded-xl shadow transition text-sm flex items-center gap-2">
+            <i class="fa-solid fa-calendar-plus"></i> Book Routine OPD Token
+          </button>
+          <button onclick="openEmergencyModal()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-red-500/20 transition text-sm flex items-center gap-2">
+            <i class="fa-solid fa-truck-medical text-amber-300"></i> Emergency Fast-Track
+          </button>
+        </div>
+      </div>
+
+      <!-- PATIENT LOGIN / AUTH BOX (If not logged in) -->
+      <div id="patientAuthBox" class="bg-white rounded-2xl border border-slate-200 p-8 max-w-md mx-auto shadow-sm">
+        <div class="text-center space-y-2 mb-6">
+          <div class="w-12 h-12 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center mx-auto text-xl">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900">Patient Sign In</h3>
+          <p class="text-xs text-slate-500">Sign in to view your token status or book without retyping details</p>
+        </div>
+
+        <div class="flex border-b border-slate-200 mb-6 text-sm font-bold">
+          <button onclick="switchPatientAuthMode('login')" id="btnPatientAuthLogin" class="flex-1 pb-3 text-brand-600 border-b-2 border-brand-600">Login</button>
+          <button onclick="switchPatientAuthMode('register')" id="btnPatientAuthRegister" class="flex-1 pb-3 text-slate-400 border-b-2 border-transparent">New Registration</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="formPatientLogin" onsubmit="handlePatientLogin(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Phone Number or Username</label>
+            <input type="text" id="patientLoginUser" required placeholder="e.g. 9876543210 or srinivas" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+            <input type="password" id="patientLoginPass" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+          </div>
+          <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl text-sm transition">
+            Sign In to Patient Portal
+          </button>
+          <div class="text-center">
+            <span class="text-xs text-slate-400">Demo Account: Phone <strong>9876543210</strong> / Password <strong>pat123</strong></span>
+          </div>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form id="formPatientRegister" onsubmit="handlePatientRegister(event)" class="space-y-4 hidden">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+            <input type="text" id="regPatientName" required placeholder="e.g. Rajesh Kumar" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Age</label>
+              <input type="number" id="regPatientAge" required placeholder="32" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Gender</label>
+              <select id="regPatientGender" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Number</label>
+            <input type="tel" id="regPatientPhone" required placeholder="10-digit mobile" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Choose Password</label>
+            <input type="password" id="regPatientPass" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+          </div>
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-sm transition">
+            Create Account & Register
+          </button>
+        </form>
+      </div>
+
+      <!-- LOGGED-IN PATIENT DASHBOARD -->
+      <div id="patientLoggedInSection" class="hidden space-y-6">
+        
+        <!-- WELCOME & QUICK STATS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 bg-sky-100 text-sky-600 rounded-xl flex items-center justify-center text-xl">
+              <i class="fa-solid fa-id-card"></i>
+            </div>
+            <div>
+              <div class="text-xs text-slate-400 font-bold uppercase">Patient Profile</div>
+              <div id="patProfileName" class="text-lg font-black text-slate-900">Patient Name</div>
+              <div id="patProfilePhone" class="text-xs text-slate-500">Phone: 9876543210</div>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl">
+              <i class="fa-solid fa-ticket"></i>
+            </div>
+            <div>
+              <div class="text-xs text-slate-400 font-bold uppercase">Active Appointments</div>
+              <div id="patActiveCount" class="text-2xl font-black text-slate-900">0</div>
+              <div class="text-xs text-slate-500">Waiting for consultation</div>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-br from-red-600 to-rose-700 text-white p-6 rounded-2xl shadow-md flex items-center justify-between">
+            <div>
+              <div class="text-xs font-bold uppercase tracking-wider text-red-200">Emergency Protocol</div>
+              <div class="text-lg font-black mt-0.5">Need Urgent Care?</div>
+              <div class="text-xs text-red-100 mt-1">Skip tokens & visit directly</div>
+            </div>
+            <button onclick="openEmergencyModal()" class="bg-white text-red-700 font-bold px-3 py-2 rounded-xl text-xs shadow hover:bg-red-50 transition">
+              Get Pass
+            </button>
+          </div>
+        </div>
+
+        <!-- MY APPOINTMENTS / TOKENS LIST -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+            <div>
+              <h3 class="text-lg font-bold text-slate-900">My Appointments & Token Status</h3>
+              <p class="text-xs text-slate-500">Track your queue progress and view your consultation tokens</p>
+            </div>
+            <button onclick="loadPatientAppointments()" class="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-rotate"></i> Refresh
+            </button>
+          </div>
+
+          <div id="patientAppointmentsContainer" class="p-6 divide-y divide-slate-100">
+            <!-- Dynamically populated with appointment cards -->
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 3. DOCTOR PORTAL TAB                                                       -->
+    <!-- ========================================================================= -->
+    <section id="tab-doctor" class="tab-content hidden space-y-8">
+      
+      <!-- DOCTOR LOGIN FORM (If not logged in as doctor) -->
+      <div id="doctorAuthBox" class="bg-white rounded-2xl border border-slate-200 p-8 max-w-lg mx-auto shadow-sm">
+        <div class="text-center space-y-2 mb-6">
+          <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl">
+            <i class="fa-solid fa-user-doctor"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900">Doctor Chamber Login</h3>
+          <p class="text-xs text-slate-500">Select or enter your Doctor Name and Password to access your OPD chamber</p>
+        </div>
+
+        <form id="formDoctorLogin" onsubmit="handleDoctorLogin(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Select Doctor Name</label>
+            <select id="docLoginSelect" onchange="onDoctorSelectChange(this)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50 font-medium text-slate-700">
+              <option value="">-- Choose Doctor Name (or type below) --</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Doctor Name or Username</label>
+            <input type="text" id="docLoginUser" required placeholder="e.g. Dr. Ramesh Varma or dr.ramesh" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Doctor Password</label>
+            <input type="password" id="docLoginPass" required placeholder="Enter doctor password (default: doc123)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
+
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>Sign In to Doctor Chamber</span>
+          </button>
+          
+          <!-- DOCTOR DIRECTORY ACCORDION -->
+          <div class="pt-3 border-t border-slate-200">
+            <details class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <summary class="font-bold cursor-pointer text-emerald-700 hover:text-emerald-800 flex items-center justify-between">
+                <span>📋 Hospital Doctors List & Default Password (doc123)</span>
+                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+              </summary>
+              <div class="mt-3 max-h-52 overflow-y-auto divide-y divide-slate-100 pr-1" id="doctorDirectoryList">
+                <!-- Dynamically populated -->
+              </div>
+            </details>
+          </div>
+        </form>
+      </div>
+
+      <!-- DOCTOR CHAMBER DASHBOARD (When logged in) -->
+      <div id="doctorChamberSection" class="hidden space-y-6">
+        
+        <!-- CHAMBER HEADER & STATS -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-wrap justify-between items-center gap-6">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-2xl flex items-center justify-center text-3xl shadow-inner">
+              <i class="fa-solid fa-user-doctor"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 id="chamberDocName" class="text-2xl font-black text-slate-900">Dr. Name</h2>
+                <span id="chamberDocRoom" class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-2.5 py-0.5 rounded-full font-bold">Room 101</span>
+              </div>
+              <div id="chamberDocSpecialty" class="text-sm font-semibold text-slate-500">Specialty</div>
+            </div>
+          </div>
+
+          <!-- PRIMARY ACTION: CALL NEXT PATIENT -->
+          <div class="flex items-center gap-3">
+            <button onclick="doctorCallNext()" id="btnCallNext" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold px-6 py-3.5 rounded-2xl shadow-lg shadow-emerald-600/30 text-base transition flex items-center gap-3 transform hover:scale-105 active:scale-95">
+              <i class="fa-solid fa-bullhorn text-amber-300 text-lg"></i>
+              <span>CALL NEXT PATIENT</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- CURRENT IN-CONSULTATION CARD -->
+        <div class="bg-white rounded-2xl border-2 border-emerald-500 shadow-md p-6 relative overflow-hidden">
+          <div class="absolute top-0 right-0 bg-emerald-500 text-white text-[11px] font-black uppercase tracking-wider px-4 py-1 rounded-bl-xl flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-white animate-ping"></span> Currently Inside Chamber
+          </div>
+
+          <div id="currentPatientContainer">
+            <div class="text-center py-6 text-slate-400">
+              <i class="fa-solid fa-person-circle-question text-4xl mb-2 text-slate-300"></i>
+              <p class="font-medium text-sm">Chamber is currently idle. Click "CALL NEXT PATIENT" to begin consultation.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRIORITY QUEUE VIEW: EMERGENCY CASES vs REGULAR TOKENS -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- EMERGENCY DIRECT PATIENTS (NO TOKEN) -->
+          <div class="bg-white rounded-2xl border-2 border-red-500/80 shadow-md overflow-hidden">
+            <div class="p-4 bg-gradient-to-r from-red-600 to-rose-600 text-white flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-white animate-pulse"></span>
+                <h3 class="font-black text-sm tracking-wide uppercase">🚨 EMERGENCY FAST-TRACK (NO TOKEN)</h3>
+              </div>
+              <span id="docEmergencyCountBadge" class="bg-white text-red-600 font-extrabold text-xs px-2.5 py-0.5 rounded-full">0 Patients</span>
+            </div>
+
+            <div class="p-4 bg-red-50/50 border-b border-red-100 text-xs text-red-800 font-medium">
+              <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+              Priority Level 0: These patients pre-empt regular tokens and are called FIRST automatically.
+            </div>
+
+            <div id="docEmergencyQueueList" class="p-4 divide-y divide-red-100 max-h-96 overflow-y-auto">
+              <!-- Dynamically populated emergency patients -->
+              <div class="text-center py-8 text-slate-400 text-xs">No pending emergency patients</div>
+            </div>
+          </div>
+
+          <!-- REGULAR APPOINTMENTS QUEUE (TOKENS) -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 bg-slate-100 border-b border-slate-200 flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-list-ol text-brand-600"></i>
+                <h3 class="font-bold text-sm text-slate-800 uppercase">Regular OPD Token Queue</h3>
+              </div>
+              <span id="docRegularCountBadge" class="bg-slate-200 text-slate-700 font-bold text-xs px-2.5 py-0.5 rounded-full">0 Waiting</span>
+            </div>
+
+            <div id="docRegularQueueList" class="p-4 divide-y divide-slate-100 max-h-96 overflow-y-auto">
+              <!-- Dynamically populated regular tokens -->
+              <div class="text-center py-8 text-slate-400 text-xs">No regular tokens in queue</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 4. ADMIN PORTAL TAB                                                        -->
+    <!-- ========================================================================= -->
+    <section id="tab-admin" class="tab-content hidden space-y-8">
+      
+      <!-- ADMIN LOGIN (If not logged in) -->
+      <div id="adminAuthBox" class="bg-white rounded-2xl border border-slate-200 p-8 max-w-md mx-auto shadow-sm">
+        <div class="text-center space-y-2 mb-6">
+          <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto text-xl">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900">Hospital Admin Sign In</h3>
+          <p class="text-xs text-slate-500">Access hospital analytics, doctor management, and queue configuration</p>
+        </div>
+
+        <form id="formAdminLogin" onsubmit="handleAdminLogin(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Username</label>
+            <input type="text" id="adminLoginUser" required value="admin" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+            <input type="password" id="adminLoginPass" required value="admin123" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-purple-500 outline-none">
+          </div>
+          <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-sm transition">
+            Sign In as Administrator
+          </button>
+          <div class="text-center">
+            <span class="text-xs text-slate-400">Default Credentials: <strong>admin</strong> / <strong>admin123</strong></span>
+          </div>
+        </form>
+      </div>
+
+      <!-- ADMIN DASHBOARD (When logged in) -->
+      <div id="adminDashboardSection" class="hidden space-y-8">
+        
+        <!-- KPI METRICS ROW -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Patients Today</div>
+            <div id="kpiTotalAppts" class="text-3xl font-black text-slate-900 mt-2">0</div>
+            <div class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-user-check text-emerald-500 mr-1"></i> OPD + Emergency</div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border-2 border-red-400 shadow-sm">
+            <div class="text-xs font-bold text-red-500 uppercase tracking-wider flex items-center justify-between">
+              <span>Emergency Cases</span>
+              <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+            </div>
+            <div id="kpiEmergencyCases" class="text-3xl font-black text-red-600 mt-2">0</div>
+            <div class="text-xs text-red-600/80 mt-1">Direct Pass (No Token)</div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">In Consultation</div>
+            <div id="kpiInConsultation" class="text-3xl font-black text-brand-600 mt-2">0</div>
+            <div class="text-xs text-slate-500 mt-1">Active in chambers</div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Est. Wait Time</div>
+            <div id="kpiAvgWait" class="text-3xl font-black text-amber-500 mt-2">0 min</div>
+            <div class="text-xs text-slate-500 mt-1">Average per patient</div>
+          </div>
+        </div>
+
+        <!-- DOCTOR MANAGEMENT & ADD DOCTOR -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-6 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4">
+            <div>
+              <h3 class="text-lg font-bold text-slate-900">Hospital Doctors & Chamber Rosters</h3>
+              <p class="text-xs text-slate-500">Manage OPD doctors, specialties, and assigned chamber rooms</p>
+            </div>
+            <button onclick="openAddDoctorModal()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition flex items-center gap-2">
+              <i class="fa-solid fa-user-plus"></i> Add New Doctor
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-50 text-slate-600 text-xs font-bold uppercase">
+                <tr>
+                  <th class="px-6 py-3">Doctor</th>
+                  <th class="px-6 py-3">Specialty</th>
+                  <th class="px-6 py-3">Room</th>
+                  <th class="px-6 py-3">Status</th>
+                  <th class="px-6 py-3">Waiting Patients</th>
+                  <th class="px-6 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminDoctorsTable" class="divide-y divide-slate-100">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- MASTER LIVE QUEUE MONITOR -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-6 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4">
+            <div>
+              <h3 class="text-lg font-bold text-slate-900">Hospital-Wide Live Appointments Queue</h3>
+              <p class="text-xs text-slate-500">All registered appointments with priority flags and status</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="adminResetQueue()" class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold px-3 py-1.5 rounded-lg text-xs transition">
+                <i class="fa-solid fa-trash-can mr-1"></i> Flush Shift Queue
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-50 text-slate-600 text-xs font-bold uppercase">
+                <tr>
+                  <th class="px-6 py-3">Type</th>
+                  <th class="px-6 py-3">Token / Pass ID</th>
+                  <th class="px-6 py-3">Patient</th>
+                  <th class="px-6 py-3">Doctor / Room</th>
+                  <th class="px-6 py-3">Priority</th>
+                  <th class="px-6 py-3">Status</th>
+                  <th class="px-6 py-3 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminAppointmentsTable" class="divide-y divide-slate-100">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 5. LIVE DISPLAY BOARD TAB (WAITING ROOM SIGNAGE)                          -->
+    <!-- ========================================================================= -->
+    <section id="tab-display" class="tab-content hidden space-y-6">
+      <div class="bg-slate-900 text-white p-6 rounded-3xl shadow-2xl border border-slate-800">
+        <div class="flex flex-wrap justify-between items-center pb-6 border-b border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-xl font-bold">
+              <i class="fa-solid fa-hospital-symbol"></i>
+            </div>
+            <div>
+              <h2 class="text-2xl font-black tracking-tight text-white">OPD & EMERGENCY QUEUE DISPLAY</h2>
+              <p class="text-xs text-slate-400">Waiting Area Digital Signage • Please watch for your Token or Emergency Callout</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 text-emerald-400 font-mono text-sm">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+            LIVE BROADCAST
+          </div>
+        </div>
+
+        <div id="signageGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-6">
+          <!-- Dynamically populated digital TV cards -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: EMERGENCY DIRECT ADMISSION (NO TOKEN NUMBER!)                       -->
+  <!-- ========================================================================= -->
+  <div id="modalEmergency" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border-4 border-red-500 animate-in fade-in duration-200">
+      
+      <!-- EMERGENCY HEADER -->
+      <div class="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white p-6">
+        <div class="flex justify-between items-start">
+          <div class="space-y-1">
+            <span class="inline-flex items-center gap-1.5 bg-white text-red-700 px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider">
+              <i class="fa-solid fa-triangle-exclamation"></i> ZERO WAIT • DIRECT ADMISSION
+            </span>
+            <h3 class="text-2xl font-black mt-2">Emergency Appointment Pass</h3>
+            <p class="text-xs text-red-100">Bypasses standard token queue. Direct walk-in to doctor / ER.</p>
+          </div>
+          <button onclick="closeEmergencyModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- EMERGENCY FORM -->
+      <form id="formEmergencyBooking" onsubmit="handleEmergencySubmit(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Patient Full Name *</label>
+          <input type="text" id="emgPatientName" required placeholder="Patient name" class="w-full px-3.5 py-2.5 rounded-xl border border-red-300 focus:ring-2 focus:ring-red-500 text-sm outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Age *</label>
+            <input type="number" id="emgAge" required placeholder="Age" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Gender *</label>
+            <select id="emgGender" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Contact Phone Number *</label>
+          <input type="tel" id="emgPhone" required placeholder="Patient or Attendant Mobile" class="w-full px-3.5 py-2.5 rounded-xl border border-red-300 focus:ring-2 focus:ring-red-500 text-sm outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Emergency Category *</label>
+          <select id="emgCategory" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none font-medium">
+            <option value="Acute Cardiac / Chest Pain Emergency">Acute Cardiac / Chest Pain / Heart Attack</option>
+            <option value="Severe Trauma / Accident / Fracture">Severe Trauma / Road Accident / Heavy Bleeding</option>
+            <option value="Severe Respiratory Distress / Asthma Attack">Severe Respiratory Distress / Asthma</option>
+            <option value="Pediatric Acute Emergency / Seizure">Pediatric Acute Emergency / Seizure</option>
+            <option value="Stroke / Neurological Paralysis">Acute Stroke Symptoms / Sudden Paralysis</option>
+            <option value="Other Critical Emergency">Other Critical Medical Emergency</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Direct Specialty / Doctor Choice (Optional)</label>
+          <select id="emgDoctorId" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none">
+            <option value="">Default: Assigned to Emergency & Trauma Specialist</option>
+            <!-- Dynamically populated doctors -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Brief Symptoms / Notes</label>
+          <textarea id="emgSymptoms" rows="2" placeholder="e.g. Sudden severe chest pain, breathing difficulty..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-500 text-sm outline-none"></textarea>
+        </div>
+
+        <div class="bg-red-50 p-3 rounded-xl border border-red-200 text-xs text-red-900 flex items-start gap-2">
+          <i class="fa-solid fa-bell text-red-600 mt-0.5"></i>
+          <div>
+            <strong>No Token Number Will Be Issued:</strong> This booking assigns an instant <strong>Priority 0 Emergency Pass</strong> directly on the doctor's screen, pre-empting standard queues.
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold py-3 rounded-xl shadow-lg shadow-red-500/30 text-base transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-bolt-lightning text-amber-300"></i>
+          <span>GENERATE EMERGENCY PASS & ENTER</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: EMERGENCY PASS RECEIPT (PRINTABLE / DISPLAYABLE)                    -->
+  <!-- ========================================================================= -->
+  <div id="modalEmergencyPassReceipt" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border-4 border-red-600 animate-in zoom-in-95 duration-200">
+      <div class="bg-red-600 text-white p-6 text-center space-y-2">
+        <div class="w-16 h-16 rounded-full bg-white text-red-600 flex items-center justify-center mx-auto text-3xl font-black shadow">
+          <i class="fa-solid fa-heart-pulse"></i>
+        </div>
+        <div class="text-xs font-bold tracking-widest uppercase text-red-200">LifeCare Emergency Dept</div>
+        <h3 class="text-2xl font-black">EMERGENCY DIRECT PASS</h3>
+        <p class="text-xs font-semibold text-white/90">AUTHORIZED DIRECT ACCESS • NO TOKEN REQUIRED</p>
+      </div>
+
+      <div id="emergencyPassReceiptContent" class="p-6 space-y-4 text-sm">
+        <!-- Injected via JS -->
+      </div>
+
+      <div class="p-6 bg-slate-50 border-t border-slate-200 flex gap-3">
+        <button onclick="window.print()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-print"></i> Print / Save
+        </button>
+        <button onclick="closeEmergencyReceipt()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
+          I Understand & Proceed
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: BOOK ROUTINE APPOINTMENT (REGULAR TOKEN NUMBER)                     -->
+  <!-- ========================================================================= -->
+  <div id="modalBookRoutine" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 animate-in fade-in duration-200">
+      
+      <div class="bg-brand-600 text-white p-6 flex justify-between items-start">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-brand-200">OPD Consultation</span>
+          <h3 class="text-xl font-black mt-1">Book Routine Appointment & Token</h3>
+          <p class="text-xs text-brand-100">Receive sequential queue token and estimated wait time</p>
+        </div>
+        <button onclick="closeBookModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="formRoutineBooking" onsubmit="handleRoutineSubmit(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Patient Full Name *</label>
+          <input type="text" id="rtnPatientName" required placeholder="Patient name" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 text-sm outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Age *</label>
+            <input type="number" id="rtnAge" required placeholder="Age" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 text-sm outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Gender *</label>
+            <select id="rtnGender" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 text-sm outline-none">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Contact Phone Number *</label>
+          <input type="tel" id="rtnPhone" required placeholder="Mobile number" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 text-sm outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Select Doctor & Department *</label>
+          <select id="rtnDoctorId" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 text-sm outline-none font-medium">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Chief Complaints / Symptoms</label>
+          <textarea id="rtnSymptoms" rows="2" placeholder="e.g. Mild fever, knee pain, routine checkup..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 text-sm outline-none"></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl text-sm shadow transition">
+          Confirm Booking & Generate OPD Token
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: ADD DOCTOR (ADMIN)                                                  -->
+  <!-- ========================================================================= -->
+  <div id="modalAddDoctor" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+      <div class="bg-purple-600 text-white p-6 flex justify-between items-center">
+        <div>
+          <h3 class="text-lg font-bold">Add New Doctor to Hospital</h3>
+          <p class="text-xs text-purple-200">Assign chamber room and credentials</p>
+        </div>
+        <button onclick="closeAddDoctorModal()" class="text-white hover:text-purple-200">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="formAddDoctor" onsubmit="handleAddDoctorSubmit(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Doctor Full Name *</label>
+          <input type="text" id="newDocName" required placeholder="e.g. Dr. Kavitha Reddy" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Medical Specialty *</label>
+          <input type="text" id="newDocSpecialty" required placeholder="e.g. Dermatology / Neurology" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Chamber Room *</label>
+            <input type="text" id="newDocRoom" required placeholder="e.g. Room 105" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Experience</label>
+            <input type="text" id="newDocExp" placeholder="e.g. 7 Years" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm outline-none">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Doctor Login Username</label>
+          <input type="text" id="newDocUsername" placeholder="e.g. dr.kavitha" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+          <input type="password" id="newDocPassword" placeholder="doc123" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm outline-none">
+        </div>
+
+        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-sm transition">
+          Add Doctor to Roster
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 flex flex-wrap justify-between items-center gap-4">
+      <div>
+        <strong>LifeCare Multi-Specialty Hospital & Research Institute</strong> • Queue & Appointment Management System
+      </div>
+      <div class="text-slate-400">
+        Emergency Priority Protocol: <strong>Priority 0 (Pre-emptive Direct Access)</strong>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <script src="app.js"></script>
+</body>
+</html>

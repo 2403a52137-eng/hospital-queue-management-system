@@ -1,0 +1,365 @@
+{
+  "users": [
+    {
+      "id": "USR-ADMIN",
+      "username": "admin",
+      "password": "admin123",
+      "name": "Hospital Administrator",
+      "role": "admin"
+    },
+    {
+      "id": "USR-DOC-1",
+      "username": "dr.vikram",
+      "password": "doc123",
+      "name": "Dr. Vikram Rao",
+      "role": "doctor",
+      "doctorId": "DOC-1"
+    },
+    {
+      "id": "USR-DOC-2",
+      "username": "dr.ramesh",
+      "password": "doc123",
+      "name": "Dr. Ramesh Varma",
+      "role": "doctor",
+      "doctorId": "DOC-2"
+    },
+    {
+      "id": "USR-DOC-3",
+      "username": "dr.priya",
+      "password": "doc123",
+      "name": "Dr. Priya Sharma",
+      "role": "doctor",
+      "doctorId": "DOC-3"
+    },
+    {
+      "id": "USR-DOC-4",
+      "username": "dr.suresh",
+      "password": "doc123",
+      "name": "Dr. Suresh Kumar",
+      "role": "doctor",
+      "doctorId": "DOC-4"
+    },
+    {
+      "id": "USR-DOC-5",
+      "username": "dr.ananya",
+      "password": "doc123",
+      "name": "Dr. Ananya Reddy",
+      "role": "doctor",
+      "doctorId": "DOC-5"
+    },
+    {
+      "id": "USR-DOC-6",
+      "username": "dr.rajesh",
+      "password": "doc123",
+      "name": "Dr. Rajesh Kulkarni",
+      "role": "doctor",
+      "doctorId": "DOC-6"
+    },
+    {
+      "id": "USR-DOC-7",
+      "username": "dr.sneha",
+      "password": "doc123",
+      "name": "Dr. Sneha Mukherjee",
+      "role": "doctor",
+      "doctorId": "DOC-7"
+    },
+    {
+      "id": "USR-DOC-8",
+      "username": "dr.arvind",
+      "password": "doc123",
+      "name": "Dr. Arvind Swamy",
+      "role": "doctor",
+      "doctorId": "DOC-8"
+    },
+    {
+      "id": "USR-DOC-9",
+      "username": "dr.meenakshi",
+      "password": "doc123",
+      "name": "Dr. Meenakshi Sundaram",
+      "role": "doctor",
+      "doctorId": "DOC-9"
+    },
+    {
+      "id": "USR-DOC-10",
+      "username": "dr.harish",
+      "password": "doc123",
+      "name": "Dr. Harish Chandra",
+      "role": "doctor",
+      "doctorId": "DOC-10"
+    },
+    {
+      "id": "USR-DOC-11",
+      "username": "dr.deepa",
+      "password": "doc123",
+      "name": "Dr. Deepa Nambiar",
+      "role": "doctor",
+      "doctorId": "DOC-11"
+    },
+    {
+      "id": "USR-DOC-12",
+      "username": "dr.sanjay",
+      "password": "doc123",
+      "name": "Dr. Sanjay Verma",
+      "role": "doctor",
+      "doctorId": "DOC-12"
+    },
+    {
+      "id": "USR-PAT-1",
+      "username": "srinivas",
+      "phone": "9876543210",
+      "password": "pat123",
+      "name": "K. Srinivas Rao",
+      "role": "patient",
+      "age": 42,
+      "gender": "Male"
+    },
+    {
+      "id": "USR-PAT-15",
+      "username": "1234567810",
+      "phone": "1234567810",
+      "password": "nandhu@45",
+      "name": "nandhu",
+      "role": "patient",
+      "age": 20,
+      "gender": "Female"
+    },
+    {
+      "id": "USR-PAT-16",
+      "username": "9705464838",
+      "phone": "9705464838",
+      "password": "akshitha@45",
+      "name": "akshitha",
+      "role": "patient",
+      "age": 22,
+      "gender": "Female"
+    }
+  ],
+  "doctors": [
+    {
+      "id": "DOC-1",
+      "name": "Dr. Vikram Rao",
+      "specialty": "Emergency & Trauma Care",
+      "room": "ER Chamber 1",
+      "status": "Available",
+      "experience": "14 Years",
+      "phone": "+91 98480 11223",
+      "username": "dr.vikram"
+    },
+    {
+      "id": "DOC-2",
+      "name": "Dr. Ramesh Varma",
+      "specialty": "General Medicine",
+      "room": "Room 101",
+      "status": "Available",
+      "experience": "12 Years",
+      "phone": "+91 98480 22334",
+      "username": "dr.ramesh"
+    },
+    {
+      "id": "DOC-3",
+      "name": "Dr. Priya Sharma",
+      "specialty": "Cardiology (Heart Care)",
+      "room": "Room 102",
+      "status": "Available",
+      "experience": "10 Years",
+      "phone": "+91 98480 33445",
+      "username": "dr.priya"
+    },
+    {
+      "id": "DOC-4",
+      "name": "Dr. Suresh Kumar",
+      "specialty": "Orthopedics & Bone Care",
+      "room": "Room 103",
+      "status": "Available",
+      "experience": "15 Years",
+      "phone": "+91 98480 44556",
+      "username": "dr.suresh"
+    },
+    {
+      "id": "DOC-5",
+      "name": "Dr. Ananya Reddy",
+      "specialty": "Pediatrics (Child Specialist)",
+      "room": "Room 104",
+      "status": "Available",
+      "experience": "8 Years",
+      "phone": "+91 98480 55667",
+      "username": "dr.ananya"
+    },
+    {
+      "id": "DOC-6",
+      "name": "Dr. Rajesh Kulkarni",
+      "specialty": "Neurology & Brain Spine",
+      "room": "Room 105",
+      "status": "Available",
+      "experience": "16 Years",
+      "phone": "+91 98480 66778",
+      "username": "dr.rajesh"
+    },
+    {
+      "id": "DOC-7",
+      "name": "Dr. Sneha Mukherjee",
+      "specialty": "Dermatology (Skin & Hair)",
+      "room": "Room 106",
+      "status": "Available",
+      "experience": "9 Years",
+      "phone": "+91 98480 77889",
+      "username": "dr.sneha"
+    },
+    {
+      "id": "DOC-8",
+      "name": "Dr. Arvind Swamy",
+      "specialty": "Pulmonology & Chest Medicine",
+      "room": "Room 107",
+      "status": "Available",
+      "experience": "13 Years",
+      "phone": "+91 98480 88990",
+      "username": "dr.arvind"
+    },
+    {
+      "id": "DOC-9",
+      "name": "Dr. Meenakshi Sundaram",
+      "specialty": "Obstetrics & Gynecology",
+      "room": "Room 108",
+      "status": "Available",
+      "experience": "18 Years",
+      "phone": "+91 98480 99001",
+      "username": "dr.meenakshi"
+    },
+    {
+      "id": "DOC-10",
+      "name": "Dr. Harish Chandra",
+      "specialty": "ENT (Ear, Nose, Throat)",
+      "room": "Room 109",
+      "status": "Available",
+      "experience": "11 Years",
+      "phone": "+91 98480 10101",
+      "username": "dr.harish"
+    },
+    {
+      "id": "DOC-11",
+      "name": "Dr. Deepa Nambiar",
+      "specialty": "Ophthalmology (Eye Care)",
+      "room": "Room 110",
+      "status": "Available",
+      "experience": "7 Years",
+      "phone": "+91 98480 20202",
+      "username": "dr.deepa"
+    },
+    {
+      "id": "DOC-12",
+      "name": "Dr. Sanjay Verma",
+      "specialty": "Gastroenterology (Digestive Care)",
+      "room": "Room 111",
+      "status": "Available",
+      "experience": "14 Years",
+      "phone": "+91 98480 30303",
+      "username": "dr.sanjay"
+    }
+  ],
+  "appointments": [
+    {
+      "id": "APT-1001",
+      "patientName": "K. Srinivas Rao",
+      "age": 42,
+      "gender": "Male",
+      "phone": "9876543210",
+      "doctorId": "DOC-2",
+      "doctorName": "Dr. Ramesh Varma",
+      "specialty": "General Medicine",
+      "isEmergency": false,
+      "tokenNumber": "T-01",
+      "priority": 1,
+      "status": "IN_CONSULTATION",
+      "symptoms": "High fever and persistent chills",
+      "createdAt": "2026-11-18T09:15:00.000Z"
+    },
+    {
+      "id": "APT-1002",
+      "patientName": "M. Lakshmi Devi",
+      "age": 35,
+      "gender": "Female",
+      "phone": "9876501234",
+      "doctorId": "DOC-2",
+      "doctorName": "Dr. Ramesh Varma",
+      "specialty": "General Medicine",
+      "isEmergency": false,
+      "tokenNumber": "T-02",
+      "priority": 1,
+      "status": "WAITING",
+      "symptoms": "Severe migraines and throat infection",
+      "createdAt": "2026-11-18T09:25:00.000Z"
+    },
+    {
+      "id": "EMG-9001",
+      "patientName": "G. Venkata Ramana",
+      "age": 58,
+      "gender": "Male",
+      "phone": "9988776655",
+      "doctorId": "DOC-3",
+      "doctorName": "Dr. Priya Sharma",
+      "specialty": "Cardiology (Heart Care)",
+      "isEmergency": true,
+      "tokenNumber": null,
+      "emergencyPassCode": "EMG-PASS-9001",
+      "priority": 0,
+      "status": "COMPLETED",
+      "emergencyCategory": "Acute Cardiac / Chest Pain Emergency",
+      "symptoms": "Sudden severe chest pressure, radiating pain, profuse sweating",
+      "createdAt": "2026-11-18T09:32:00.000Z",
+      "completedAt": "2026-11-18T11:22:25.510Z"
+    },
+    {
+      "id": "EMG-1004",
+      "patientName": "nandhu",
+      "age": 12,
+      "gender": "Female",
+      "phone": "1234567810",
+      "doctorId": "DOC-1",
+      "doctorName": "Dr. Vikram Rao",
+      "specialty": "Emergency & Trauma Care",
+      "isEmergency": true,
+      "tokenNumber": null,
+      "emergencyPassCode": "EMG-PASS-8357",
+      "priority": 0,
+      "status": "COMPLETED",
+      "emergencyCategory": "Severe Trauma / Accident / Fracture",
+      "symptoms": "leg twisted and bleeding",
+      "createdAt": "2026-11-18T11:18:37.359Z",
+      "completedAt": "2026-11-18T11:22:30.234Z"
+    },
+    {
+      "id": "APT-1005",
+      "patientName": "rahul",
+      "age": 30,
+      "gender": "Male",
+      "phone": "9705464838",
+      "doctorId": "DOC-3",
+      "doctorName": "Dr. Priya Sharma",
+      "specialty": "Cardiology (Heart Care)",
+      "isEmergency": false,
+      "tokenNumber": "T-01",
+      "priority": 1,
+      "status": "WAITING",
+      "symptoms": "mild chest pain",
+      "createdAt": "2026-11-18T15:43:21.448Z"
+    },
+    {
+      "id": "EMG-1006",
+      "patientName": "saritha",
+      "age": 45,
+      "gender": "Female",
+      "phone": "8106335881",
+      "doctorId": "DOC-10",
+      "doctorName": "Dr. Harish Chandra",
+      "specialty": "ENT (Ear, Nose, Throat)",
+      "isEmergency": true,
+      "tokenNumber": null,
+      "emergencyPassCode": "EMG-PASS-5832",
+      "priority": 0,
+      "status": "EMERGENCY_WAITING",
+      "emergencyCategory": "Severe Respiratory Distress / Asthma Attack",
+      "symptoms": "breathing issue",
+      "createdAt": "2026-11-18T15:46:13.305Z"
+    }
+  ]
+}

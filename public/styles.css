@@ -1,0 +1,60 @@
+/* Custom Styles for Hospital Queue & Appointment System */
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.8);
+  }
+}
+
+.emergency-glow {
+  animation: pulseGlow 1.8s infinite;
+}
+
+/* Nav Button Active State */
+.nav-btn.active {
+  background-color: #0284c7;
+  color: #ffffff !important;
+}
+
+/* Ticket Notch styling */
+.ticket-card {
+  position: relative;
+  background-image: radial-gradient(circle at 0 50%, transparent 8px, #ffffff 9px), radial-gradient(circle at 100% 50%, transparent 8px, #ffffff 9px);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Print Styles for Emergency Pass and Token */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #modalEmergencyPassReceipt,
+  #modalEmergencyPassReceipt * {
+    visibility: visible;
+  }
+  #modalEmergencyPassReceipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white;
+  }
+}

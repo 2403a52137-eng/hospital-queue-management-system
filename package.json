@@ -1,0 +1,18 @@
+{
+  "name": "hospital-management-system",
+  "version": "1.0.0",
+  "description": "Hospital Queue and Appointment Management System with Emergency Fast-Track Bypass and Multi-Portal Dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "hospital-queue",
+    "appointment-management",
+    "emergency-triage",
+    "priority-queue"
+  ],
+  "author": "Student Project",
+  "license": "ISC"
+}
